@@ -123,6 +123,8 @@ class Design:
     def gen_pdk_config(self):
 
         def path_helper(file_path:str):
+            file_path = file_path.replace('\\','/')
+
             if os.path.isabs(file_path):
                 return file_path
             else:
