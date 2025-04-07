@@ -3,17 +3,20 @@ import shutil
 from datetime import datetime
 
 class Design:
-    def __init__(self):
+    def __init__(self,proj_name:str):
         
-        self.proj_name:str = ""
+        self.proj_name:str = proj_name
 
         self.file_name_list:list[str] = []
         self.file_type:str = ""
         self.top_name :str = ""
+
         self.clk_name :str = ""
-        
+        self.clk_period:int = 0
+
         self.search_path:str = ""
         self.target_library:str = ""
+        self.link_library:str = ""
         self.symbol_library:str = ""
 
 
@@ -37,32 +40,64 @@ class Design:
 
         self.tcl_text:str = ''
 
+
+        self.prepare()
+
         # pdk 
         pass 
 
 
-    def set_process(self):
-        pass 
+    def set_pdk(self,target_library:str,link_library:str='',symbol_library:str=''):
+        def path_helper(file_path:str):
+            if os.path.isabs(file_path):
+                return file_path
+            else:
+                base_path = os.path.dirname(os.path.abspath(__file__))
+                file_path = os.path.join(base_path,file_path)
 
-    def set_design(self):
-        pass
+                return file_path
 
-    def set_clock(self):
-        pass 
+        self.target_library = path_helper(target_library)
+        if link_library:
+            self.link_library = path_helper(link_library)
+        if symbol_library:
+            self.symbol_library = path_helper(symbol_library)
+
+
+    def set_design(self,file_name_list:list[str],top_name:str):
+        self.file_name_list = file_name_list
+        self.top_name = top_name
+
+
+    def set_clock(self,clock_name:str,clk_period:int):
+        self.clk_name = clock_name
+        self.clk_period = clk_period
 
     def set_report(self):
         pass 
 
 
-    def set_worksapce(self):
-        pass 
+    def set_workspace(self):
+        pass
 
 
-    def add_switching_activity(self):
-        pass 
+    def add_switching_activity(self,port_name:str,toggle_rate:int,static_probability:int):
+        self.switch_activity_list.append(
+            (port_name,toggle_rate,static_probability)
+        )
+
+    def add_case_activity(self,port_name:str,case_value:int):
+        self.case_list.append(
+            (port_name,case_value)
+        )
+
+
 
     def gen_workspace_config(self):
-        s = f'set search_path "{self.search_path}"\n'
+        s = f'set search_path "{self.work_path}"\n'
+        s += f'set report_path "{os.path.join(self.work_path,"report")}" '
+
+        return s
 
 
     def gen_pdk_config(self):
@@ -73,14 +108,16 @@ class Design:
         return s
 
     def gen_design_config(self):
-        s =  f'read_file -format {self.file_type} {' '.join(self.file_name_list)}\n'
-        s += f'current_design {self.top_name}\n'
+        # s =  f'read_file -format {self.file_type} {' '.join(self.file_name_list)}\n'
+        # s += f'current_design {self.top_name}\n'
+        s =  f'analyze -format {self.file_type} {"".join(self.file_name_list)} \n'
+        s += f'elaborate {self.top_name}\n'
 
         return s  
     
 
     def gen_clock_config(self):
-        s = f'create_clock -period 1 [get_ports {self.clk_name}] -name clk\n' 
+        s = f'create_clock -period {self.clk_period} [get_ports {self.clk_name}] -name clk\n'
 
         return s 
 
@@ -150,4 +187,4 @@ class Design:
             
 
     def run_design_compiler(self):
-        pass 
+        pass
