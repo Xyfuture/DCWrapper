@@ -30,6 +30,8 @@ class Design:
 
         self.base_workspace:str = ""
 
+        self.enable_optimize = False
+
         self.tcl_template:list = [
             self.gen_workspace_config,
             self.gen_pdk_config,
@@ -78,6 +80,10 @@ class Design:
     def set_clock(self,clock_name:str,clk_period:int):
         self.clk_name = clock_name
         self.clk_period = clk_period
+
+
+    def set_compile_option(self,enable_optimize:bool = False):
+        self.enable_optimize = enable_optimize
 
     def set_report(self):
         pass 
@@ -176,7 +182,10 @@ class Design:
 
 
     def gen_compile(self):
-        s = f'compile_ultra -gate_clock\n' 
+        if self.enable_optimize:
+            s = f'compile_ultra -gate_clock\n'
+        else:
+            s = f'compile -gate_clock\n'
         return s
 
     def gen_report(self):
