@@ -2,6 +2,7 @@ import inspect
 import os
 import shutil
 from datetime import datetime
+import subprocess
 
 class Design:
     def __init__(self,proj_name:str):
@@ -37,6 +38,7 @@ class Design:
             self.gen_pdk_config,
             self.gen_design_config,
             self.gen_clock_config,
+            self.gen_input_delay,
             self.gen_switching_activity,
             self.gen_compile,
             self.gen_report,
@@ -169,6 +171,10 @@ class Design:
 
         return s 
 
+    def gen_input_delay(self):
+        s = f'set_input_delay 0.01 -clock clk [all_inputs]'
+        return s 
+
     def gen_switching_activity(self):
         # s = 'set_switching_activity -base_clock clk -toggle 1 -static 0.5 -clk\n' # 感觉不需要
         s = ''
@@ -247,4 +253,25 @@ class Design:
             
 
     def run_design_compiler(self):
-        pass
+        current_dir = os.getcwd()
+        try:
+            os.chdir(self.work_path)
+
+            command = 'dc_shell -f dc.tcl'
+
+            process = subprocess.Popen(command,shell=True,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+
+            process.stdin.write('exit\n')
+
+            stdout, stderr = process.communicate()
+
+            # 检查错误
+            if process.returncode != 0:
+                print(f"Error: {stderr.decode()}")
+            else:
+                print(f"Output: {stdout.decode()}")
+
+
+            process.wait()
+        finally:
+            os.chdir(current_dir)
