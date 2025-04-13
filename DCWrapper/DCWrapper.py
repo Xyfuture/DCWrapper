@@ -269,7 +269,7 @@ class Design:
 
             process = subprocess.Popen(command,shell=True,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 
-            process.stdin.write('exit\n')
+            # process.stdin.write('exit\n'.encode())
 
             stdout, stderr = process.communicate()
 
