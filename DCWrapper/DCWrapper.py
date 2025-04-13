@@ -163,7 +163,7 @@ class Design:
         # s += f'current_design {self.top_name}\n'
         s = ''
         for file_name in self.file_name_list:
-            s += f'analyze -format {self.file_type} {filename} \n'
+            s += f'analyze -format {self.file_type} {file_name} \n'
         # s =  f'analyze -format {self.file_type} {" ".join(self.file_name_list)} \n'
         s += f'elaborate {self.top_name}\n'
 
