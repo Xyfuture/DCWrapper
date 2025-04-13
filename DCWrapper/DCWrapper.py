@@ -39,6 +39,7 @@ class Design:
             self.gen_design_config,
             self.gen_clock_config,
             self.gen_input_delay,
+            self.gen_area_target,
             self.gen_switching_activity,
             self.gen_compile,
             self.gen_report,
@@ -160,7 +161,10 @@ class Design:
     def gen_design_config(self):
         # s =  f'read_file -format {self.file_type} {' '.join(self.file_name_list)}\n'
         # s += f'current_design {self.top_name}\n'
-        s =  f'analyze -format {self.file_type} {"".join(self.file_name_list)} \n'
+        s = ''
+        for file_name in self.file_name_list:
+            s += f'analyze -format {self.file_type} {filename} \n'
+        # s =  f'analyze -format {self.file_type} {" ".join(self.file_name_list)} \n'
         s += f'elaborate {self.top_name}\n'
 
         return s  
@@ -173,6 +177,10 @@ class Design:
 
     def gen_input_delay(self):
         s = f'set_input_delay 0.01 -clock clk [all_inputs]'
+        return s 
+
+    def gen_area_target(self):
+        s = f'set_max_area 0.0'
         return s 
 
     def gen_switching_activity(self):
